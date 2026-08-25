@@ -1,6 +1,6 @@
-11.1 https://ftp.altlinux.org/pub/distributions/ALTLinux/p11/images/server/x86_64/alt-server-11.1-x86_64.iso
-11.0 https://ftp.altlinux.org/pub/distributions/ALTLinux/p11/images/server/x86_64/alt-server-11.0-x86_64.iso
-10.4 https://ftp.altlinux.org/pub/distributions/ALTLinux/p10/images/server/x86_64/alt-server-10.4-x86_64.iso
-10.2 https://ftp.altlinux.org/pub/distributions/ALTLinux/p10/images/server/x86_64/alt-server-10.2-x86_64.iso
-10.1 https://ftp.altlinux.org/pub/distributions/ALTLinux/p10/images/server/x86_64/alt-server-10.1-x86_64.iso
-10.0 https://ftp.altlinux.org/pub/distributions/ALTLinux/p10/images/server/x86_64/alt-server-10.0-x86_64.iso
+11.1 https://mirror.yandex.ru/altlinux/p11/images/server/x86_64/alt-server-11.1-x86_64.iso
+11.0 https://mirror.yandex.ru/altlinux/p11/images/server/x86_64/alt-server-11.0-x86_64.iso
+10.4 https://mirror.yandex.ru/altlinux/p10/images/server/x86_64/alt-server-10.4-x86_64.iso
+10.2 https://mirror.yandex.ru/altlinux/p10/images/server/x86_64/alt-server-10.2-x86_64.iso
+10.1 https://mirror.yandex.ru/altlinux/p10/images/server/x86_64/alt-server-10.1-x86_64.iso
+10.0 https://mirror.yandex.ru/altlinux/p10/images/server/x86_64/alt-server-10.0-x86_64.iso
