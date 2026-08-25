@@ -181,7 +181,7 @@ while read -r tag source || [ -n "$tag" ]; do
     s umount -f "$MNT_SQUASH" 2>/dev/null || true
     s umount -f "$MNT_ISO" 2>/dev/null || true
     s rm -rf "$MNT_SQUASH" "$MNT_ISO"
-    if [[ "$source" =~ ^https?:// ]] && [ -f "${LOCAL_ISO:-}" ]; then
+    if [[ "${LOCAL_ISO:-}" =~ ^/tmp/altlinux-iso-patch_download_ ]] && [ -f "${LOCAL_ISO:-}" ]; then
       rm -f "$LOCAL_ISO"
     fi
     if [ "${CLEANUP_DOCKER_IMAGES:-true}" = "true" ] && [ ${#CREATED_TAGS[@]} -gt 0 ]; then
@@ -217,8 +217,33 @@ while read -r tag source || [ -n "$tag" ]; do
   log_info "1. Mounting ISO..."
   s mount -o loop,ro "$LOCAL_ISO" "$MNT_ISO"
 
-  log_info "2. Mounting live SquashFS image..."
-  s mount -o loop,ro "${MNT_ISO}/live" "$MNT_SQUASH"
+  log_info "2. Discovering and mounting live SquashFS image..."
+  SQUASH_FILE=""
+  for candidate in \
+      "${MNT_ISO}/live" "${MNT_ISO}/LIVE" \
+      "${MNT_ISO}/rescue" "${MNT_ISO}/RESCUE" \
+      "${MNT_ISO}/altinst" "${MNT_ISO}/ALTINST" \
+      "${MNT_ISO}/LiveOS/rootfs.img" "${MNT_ISO}/images/install.img"; do
+    if [ -f "$candidate" ]; then
+      SQUASH_FILE="$candidate"
+      break
+    fi
+  done
+
+  if [ -z "$SQUASH_FILE" ]; then
+    SQUASH_FILE=$(find "${MNT_ISO}" -maxdepth 2 -type f \( -iname "*squashfs*" -o -iname "*live*" -o -iname "*rescue*" -o -iname "*altinst*" \) 2>/dev/null | head -n 1 || true)
+  fi
+
+  if [ -z "$SQUASH_FILE" ] || [ ! -f "$SQUASH_FILE" ]; then
+    log_error "Could not find live/rescue SquashFS image in ISO!"
+    exit 1
+  fi
+
+  log_info "Found SquashFS image: ${SQUASH_FILE}"
+  if ! s mount -o loop,ro "$SQUASH_FILE" "$MNT_SQUASH" 2>/dev/null; then
+    log_info "Direct loop mount failed, unpacking via unsquashfs..."
+    s unsquashfs -f -d "$MNT_SQUASH" "$SQUASH_FILE"
+  fi
 
   log_info "3. Exporting optimized rootfs (excluding kernel, firmware, llvm/mesa, alterator, docs, foreign locales) into Docker..."
   s tar -C "$MNT_SQUASH" \
@@ -253,8 +278,8 @@ while read -r tag source || [ -n "$tag" ]; do
   s umount -f "$MNT_SQUASH" 2>/dev/null || true
   s umount -f "$MNT_ISO" 2>/dev/null || true
   s rm -rf "$MNT_SQUASH" "$MNT_ISO"
-  if [[ "$source" =~ ^https?:// ]] && [ -f "${LOCAL_ISO:-}" ]; then
-    log_info "Removing downloaded ISO: $LOCAL_ISO to save disk space..."
+  if [[ "${LOCAL_ISO:-}" =~ ^/tmp/altlinux-iso-patch_download_ ]] && [ -f "${LOCAL_ISO:-}" ]; then
+    log_info "Removing temporary downloaded ISO: $LOCAL_ISO to save disk space..."
     rm -f "$LOCAL_ISO"
   fi
 
