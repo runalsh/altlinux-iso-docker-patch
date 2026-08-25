@@ -1,0 +1,36 @@
+name: Auto-Discover New ALT Linux Releases
+
+on:
+  schedule:
+    - cron: '0 3 * * 1' # Every Monday at 03:00 UTC
+  workflow_dispatch:
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Run discovery script
+        run: python3 discover_new_releases.py
+
+      - name: Commit and push changes if releases.txt updated
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if ! git diff --quiet releases.txt; then
+            git add releases.txt
+            git commit -m "chore: auto-discover new ALT Linux releases"
+            git push
+          else
+            echo "No new releases found."
+          fi

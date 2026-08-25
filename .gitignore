@@ -1,0 +1,6 @@
+*.iso
+*.qcow2
+*.tar.*
+.DS_Store
+*.swp
+*.log
